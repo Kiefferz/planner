@@ -49,6 +49,48 @@ let savedPlayerValues = {};
 // ============================================
 
 /**
+ * Met à jour l'alerte visuelle pour une position selon le nombre de joueurs remplis
+ * @param {string} positionKey - Clé de la position (ex: 'gb', 'dg')
+ */
+function updatePositionAlert(positionKey) {
+    const positionDiv = document.querySelector(`.position-${positionKey}`);
+    if (!positionDiv) return;
+    
+    const positionBox = positionDiv.querySelector('.position-box');
+    const inputs = positionDiv.querySelectorAll('.player-input');
+    const alertIcon = positionDiv.querySelector('.alert-icon');
+    
+    if (!positionBox || !inputs || !alertIcon) return;
+    
+    // Compter le nombre de joueurs remplis
+    let filledCount = 0;
+    inputs.forEach(input => {
+        if (input.value.trim() !== '') {
+            filledCount++;
+        }
+    });
+    
+    // Retirer toutes les classes d'alerte
+    positionBox.classList.remove('alert-danger', 'alert-warning');
+    alertIcon.textContent = '';
+    alertIcon.className = 'alert-icon';
+    
+    // Appliquer les classes et icônes selon le nombre de joueurs
+    if (filledCount < 2) {
+        // Moins de 2 joueurs : rouge + icône danger
+        positionBox.classList.add('alert-danger');
+        alertIcon.textContent = '⚠️';
+        alertIcon.className = 'alert-icon alert-icon-danger';
+    } else if (filledCount < 3) {
+        // Moins de 3 joueurs (donc 2) : orange + icône warning
+        positionBox.classList.add('alert-warning');
+        alertIcon.textContent = '⚡';
+        alertIcon.className = 'alert-icon alert-icon-warning';
+    }
+    // Si 3 joueurs remplis, on laisse le style par défaut
+}
+
+/**
  * Sauvegarde les valeurs actuelles des inputs
  */
 function saveCurrentPlayerValues() {
@@ -89,7 +131,17 @@ function createPositionElement(positionKey, layout) {
     
     const label = document.createElement('div');
     label.className = 'position-label';
-    label.textContent = positionLabels[positionKey] || positionKey.toUpperCase();
+    
+    // Créer un conteneur pour le texte et l'icône
+    const labelText = document.createElement('span');
+    labelText.textContent = positionLabels[positionKey] || positionKey.toUpperCase();
+    label.appendChild(labelText);
+    
+    // Créer un conteneur pour l'icône d'alerte (sera ajouté dynamiquement)
+    const alertIcon = document.createElement('span');
+    alertIcon.className = 'alert-icon';
+    label.appendChild(alertIcon);
+    
     positionBox.appendChild(label);
     
     // Créer 3 inputs pour chaque position
@@ -106,13 +158,17 @@ function createPositionElement(positionKey, layout) {
             input.value = savedPlayerValues[positionKey][i.toString()];
         }
         
-        // Ajouter l'écouteur pour sauvegarder automatiquement
+        // Ajouter l'écouteur pour sauvegarder automatiquement et mettre à jour l'alerte
         input.addEventListener('input', function() {
             saveToLocalStorage();
+            updatePositionAlert(positionKey);
         });
         
         positionBox.appendChild(input);
     }
+    
+    // Mettre à jour l'alerte après création
+    updatePositionAlert(positionKey);
     
     positionDiv.appendChild(positionBox);
     return positionDiv;
@@ -164,6 +220,11 @@ function changeFormation(formation) {
                 input.value = savedPlayerValues[position][index];
             }
         });
+    });
+
+    // Mettre à jour les alertes pour toutes les positions
+    config.positions.forEach(positionKey => {
+        updatePositionAlert(positionKey);
     });
 
     // Sauvegarder la formation
