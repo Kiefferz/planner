@@ -3,6 +3,179 @@
  * Gestion de la formation tactique 4-2-3-1
  */
 
+// Formation actuelle
+let currentFormation = '4-2-3-1';
+
+// Mapping des labels pour chaque position
+const positionLabels = {
+    'gb': 'GB',
+    'dg': 'DG',
+    'dd': 'DD',
+    'dc': 'DC',
+    'dc-left': 'DC',
+    'dc-right': 'DC',
+    'dc-top': 'DC',
+    'dc-middle': 'DC',
+    'dc-bottom': 'DC',
+    'dcg': 'DCG',
+    'dcd': 'DCD',
+    'mg': 'MG',
+    'mc': 'MC',
+    'md': 'MD',
+    'mcg': 'MCG',
+    'mcd': 'MCD',
+    'mdc': 'MDC',
+    'mdc-left': 'MDC',
+    'mdc-right': 'MDC',
+    'mdc-top': 'MDC',
+    'mdc-bottom': 'MDC',
+    'moc': 'MOC',
+    'aig': 'AIG',
+    'aid': 'AID',
+    'alg': 'ALG',
+    'ald': 'ALD',
+    'bu': 'BU',
+    'bu-left': 'BU',
+    'bu-right': 'BU',
+    'bu-top': 'BU',
+    'bu-bottom': 'BU'
+};
+
+// Stockage des valeurs des inputs avant changement de formation
+let savedPlayerValues = {};
+
+// ============================================
+// GESTION DES FORMATIONS
+// ============================================
+
+/**
+ * Sauvegarde les valeurs actuelles des inputs
+ */
+function saveCurrentPlayerValues() {
+    savedPlayerValues = {};
+    document.querySelectorAll('.player-input').forEach(input => {
+        const position = input.getAttribute('data-position');
+        const index = input.getAttribute('data-index');
+        const value = input.value.trim();
+        if (value) {
+            if (!savedPlayerValues[position]) {
+                savedPlayerValues[position] = {};
+            }
+            savedPlayerValues[position][index] = value;
+        }
+    });
+}
+
+/**
+ * Crée un élément de position HTML
+ * @param {string} positionKey - Clé de la position (ex: 'gb', 'dg')
+ * @param {object} layout - Configuration de positionnement
+ * @returns {HTMLElement} Élément de position créé
+ */
+function createPositionElement(positionKey, layout) {
+    const positionDiv = document.createElement('div');
+    positionDiv.className = `position-${positionKey}`;
+    positionDiv.style.position = 'absolute';
+    
+    if (layout.top) positionDiv.style.top = layout.top;
+    if (layout.left) positionDiv.style.left = layout.left;
+    if (layout.right) positionDiv.style.right = layout.right;
+    if (layout.transform) {
+        positionDiv.style.transform = layout.transform;
+    }
+    
+    const positionBox = document.createElement('div');
+    positionBox.className = 'position-box';
+    
+    const label = document.createElement('div');
+    label.className = 'position-label';
+    label.textContent = positionLabels[positionKey] || positionKey.toUpperCase();
+    positionBox.appendChild(label);
+    
+    // Créer 3 inputs pour chaque position
+    for (let i = 0; i < 3; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'player-input';
+        input.setAttribute('data-position', positionKey);
+        input.setAttribute('data-index', i.toString());
+        input.placeholder = (i + 1).toString();
+        
+        // Restaurer la valeur sauvegardée si elle existe
+        if (savedPlayerValues[positionKey] && savedPlayerValues[positionKey][i.toString()]) {
+            input.value = savedPlayerValues[positionKey][i.toString()];
+        }
+        
+        // Ajouter l'écouteur pour sauvegarder automatiquement
+        input.addEventListener('input', function() {
+            saveToLocalStorage();
+        });
+        
+        positionBox.appendChild(input);
+    }
+    
+    positionDiv.appendChild(positionBox);
+    return positionDiv;
+}
+
+/**
+ * Change la formation tactique
+ * @param {string} formation - Nom de la formation (ex: '4-2-3-1')
+ */
+function changeFormation(formation) {
+    if (typeof formations === 'undefined') {
+        console.error('Le fichier formations.js n\'est pas chargé');
+        return;
+    }
+    
+    if (!formations[formation]) {
+        console.error('Formation inconnue:', formation);
+        return;
+    }
+
+    // Sauvegarder les valeurs actuelles avant de changer
+    saveCurrentPlayerValues();
+
+    currentFormation = formation;
+    const config = formations[formation];
+    const fieldContainer = document.getElementById('fieldContainer');
+    
+    if (!fieldContainer) {
+        console.error('Le conteneur field-container n\'existe pas');
+        return;
+    }
+
+    // Vider le conteneur
+    fieldContainer.innerHTML = '';
+
+    // Créer et ajouter chaque position
+    config.positions.forEach(positionKey => {
+        if (config.layout[positionKey]) {
+            const positionElement = createPositionElement(positionKey, config.layout[positionKey]);
+            fieldContainer.appendChild(positionElement);
+        }
+    });
+
+    // Restaurer les valeurs sauvegardées après création
+    Object.keys(savedPlayerValues).forEach(position => {
+        Object.keys(savedPlayerValues[position]).forEach(index => {
+            const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
+            if (input) {
+                input.value = savedPlayerValues[position][index];
+            }
+        });
+    });
+
+    // Sauvegarder la formation
+    saveToLocalStorage();
+    
+    // Mettre à jour le select
+    const select = document.getElementById('formationSelect');
+    if (select) {
+        select.value = formation;
+    }
+}
+
 // ============================================
 // GESTION DU LOGO
 // ============================================
@@ -25,9 +198,8 @@ function loadLogo(url) {
     };
     
     logoImg.onerror = function() {
-        // Erreur de chargement
-        alert('❌ Impossible de charger l\'image. Vérifiez l\'URL.');
-        logoInput.value = url; // Garder l'URL dans l'input
+        // Erreur de chargement        
+        logoInput.value = ''; // Garder l'URL dans l'input
     };
     
     logoImg.src = url.trim();
@@ -88,7 +260,7 @@ function exportData() {
     const season = document.getElementById('season').value.trim() || '';
 
     const data = {
-        formation: '4-2-3-1',
+        formation: currentFormation,
         logoUrl: logoUrl,
         teamName: teamName,
         season: season,
@@ -137,30 +309,35 @@ function importData(event) {
                     document.getElementById('season').value = data.season;
                 }
 
-                // Réinitialiser tous les champs
-                const inputs = document.querySelectorAll('.player-input');
-                inputs.forEach(input => input.value = '');
-
-                // Remplir les champs avec les données importées
+                // Charger les joueurs dans savedPlayerValues pour qu'ils soient restaurés après création
+                savedPlayerValues = {};
                 Object.keys(data.players).forEach(position => {
                     const positionData = data.players[position];
+                    savedPlayerValues[position] = {};
                     // Support ancien format (array) et nouveau format (object)
                     if (Array.isArray(positionData)) {
                         positionData.forEach((name, index) => {
-                            const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
-                            if (input) {
-                                input.value = name;
+                            if (name) {
+                                savedPlayerValues[position][index.toString()] = name;
                             }
                         });
                     } else {
                         Object.keys(positionData).forEach(index => {
-                            const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
-                            if (input) {
-                                input.value = positionData[index];
+                            if (positionData[index]) {
+                                savedPlayerValues[position][index] = positionData[index];
                             }
                         });
                     }
                 });
+
+                // Charger la formation (les valeurs seront restaurées automatiquement)
+                if (data.formation && formations[data.formation]) {
+                    document.getElementById('formationSelect').value = data.formation;
+                    changeFormation(data.formation);
+                } else {
+                    // Si pas de formation, utiliser la formation actuelle
+                    changeFormation(currentFormation);
+                }
 
                 // Sauvegarder dans localStorage
                 saveToLocalStorage();
@@ -205,6 +382,7 @@ function saveToLocalStorage() {
     const season = document.getElementById('season').value.trim() || '';
 
     const data = {
+        formation: currentFormation,
         logoUrl: logoUrl,
         teamName: teamName,
         season: season,
@@ -222,11 +400,23 @@ function loadFromLocalStorage() {
     if (saved) {
         try {
             const data = JSON.parse(saved);
-            
+
             // Charger les infos équipe
-            if (data.logoUrl) {
-                document.getElementById('logoUrlInput').value = data.logoUrl;
+            const logoImg = document.getElementById('teamLogo');
+            const logoInput = document.getElementById('logoUrlInput');
+            
+            if (data.logoUrl && data.logoUrl !== 'assets/fm_planner.png' && data.logoUrl.trim() !== '') {
+                // Charger le logo personnalisé sauvegardé
+                logoInput.value = data.logoUrl;
                 loadLogo(data.logoUrl);
+            } else {
+                // Afficher le logo par défaut si aucun logo personnalisé n'est sauvegardé
+                if (logoImg && logoInput) {
+                    logoImg.src = 'assets/fm_planner.png';
+                    logoImg.classList.remove('hidden');
+                    logoInput.value = '';
+                    logoInput.classList.add('hidden');
+                }
             }
             if (data.teamName) {
                 document.getElementById('teamName').value = data.teamName;
@@ -235,24 +425,24 @@ function loadFromLocalStorage() {
                 document.getElementById('season').value = data.season;
             }
 
-            // Charger les joueurs
+            // Charger les joueurs dans savedPlayerValues pour qu'ils soient restaurés après création
             const players = data.players || data; // Support ancien format
             if (players && typeof players === 'object') {
+                savedPlayerValues = {};
                 Object.keys(players).forEach(position => {
                     const positionData = players[position];
+                    savedPlayerValues[position] = {};
                     // Support ancien format (array) et nouveau format (object)
                     if (Array.isArray(positionData)) {
                         positionData.forEach((name, index) => {
-                            const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
-                            if (input) {
-                                input.value = name;
+                            if (name) {
+                                savedPlayerValues[position][index.toString()] = name;
                             }
                         });
                     } else if (typeof positionData === 'object') {
                         Object.keys(positionData).forEach(index => {
-                            const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
-                            if (input) {
-                                input.value = positionData[index];
+                            if (positionData[index]) {
+                                savedPlayerValues[position][index] = positionData[index];
                             }
                         });
                     }
@@ -285,14 +475,25 @@ function clearAllData() {
     // Vider les champs équipe
     document.getElementById('teamName').value = '';
     document.getElementById('season').value = '';
-    document.getElementById('logoUrlInput').value = '';
 
     // Réinitialiser le logo
     const logoImg = document.getElementById('teamLogo');
     const logoInput = document.getElementById('logoUrlInput');
-    logoImg.src = '';
-    logoImg.classList.add('hidden');
-    logoInput.classList.remove('hidden');
+    
+    // Vider l'input du logo
+    if (logoInput) {
+        logoInput.value = '';
+    }
+    
+    // Réinitialiser au logo par défaut
+    if (logoImg) {
+        logoImg.src = 'assets/fm_planner.png';
+        logoImg.classList.remove('hidden');
+    }
+    if (logoInput) {
+        logoInput.value = '';
+        logoInput.classList.add('hidden');
+    }
 
     // Vider le localStorage
     localStorage.removeItem('footballFormation');
@@ -371,7 +572,26 @@ document.addEventListener('click', function(event) {
  * Initialise l'application au chargement de la page
  */
 function init() {
-    // Charger le logo depuis l'URL si présent
+    console.log('Initialisation de l\'application...');
+    console.log('Formations disponibles:', typeof formations !== 'undefined' ? Object.keys(formations) : 'NON CHARGÉES');
+    
+    // Vérifier que le DOM est prêt
+    if (!document.getElementById('formationSelect')) {
+        console.error('Le DOM n\'est pas prêt, réessai dans 100ms...');
+        setTimeout(init, 100);
+        return;
+    }
+
+    // Afficher le logo par défaut au démarrage
+    const logoImg = document.getElementById('teamLogo');
+    const logoInput = document.getElementById('logoUrlInput');
+    if (logoImg && logoInput) {
+        // Le logo par défaut est déjà dans le HTML, on s'assure qu'il est visible
+        logoImg.classList.remove('hidden');
+        logoInput.classList.add('hidden');
+    }
+
+    // Charger le logo depuis l'URL si présent (surcharge le logo par défaut)
     const logoUrl = getUrlParameter('logo');
     if (logoUrl) {
         document.getElementById('logoUrlInput').value = decodeURIComponent(logoUrl);
@@ -396,24 +616,51 @@ function init() {
         }
     });
 
-    // Sauvegarder automatiquement dans le localStorage
-    document.querySelectorAll('.player-input').forEach(input => {
-        input.addEventListener('input', function() {
-            saveToLocalStorage();
-        });
-    });
+    // Les event listeners sont ajoutés lors de la création des positions dans createPositionElement
 
     // Sauvegarder les infos équipe
     document.getElementById('teamName').addEventListener('input', saveToLocalStorage);
     document.getElementById('season').addEventListener('input', saveToLocalStorage);
-
-    // Charger depuis le localStorage
-    loadFromLocalStorage();
     
+    // Écouter le changement de formation
+    document.getElementById('formationSelect').addEventListener('change', function() {
+        changeFormation(this.value);
+    });
+
     // Charger le thème
     loadTheme();
+
+    // Charger les données depuis le localStorage AVANT de créer la formation
+    // Cela permet de charger les valeurs des joueurs dans savedPlayerValues
+    loadFromLocalStorage();
+
+    // Charger la formation depuis le localStorage ou utiliser la formation par défaut
+    const savedData = localStorage.getItem('footballFormation');
+    let formationToLoad = '4-2-3-1'; // Formation par défaut
+    
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            if (data.formation && typeof formations !== 'undefined' && formations[data.formation]) {
+                formationToLoad = data.formation;
+            }
+        } catch (e) {
+            console.error('Erreur lors du chargement de la formation:', e);
+        }
+    }
+    
+    // Initialiser la formation (les valeurs seront restaurées automatiquement)
+    console.log('Chargement de la formation:', formationToLoad);
+    changeFormation(formationToLoad);
+    
+    console.log('Initialisation terminée');
 }
 
 // Initialiser l'application quand le DOM est prêt
-window.addEventListener('load', init);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    // DOM déjà chargé
+    window.addEventListener('load', init);
+}
 

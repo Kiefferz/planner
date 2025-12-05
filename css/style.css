@@ -145,6 +145,34 @@ body.dark-mode .team-info input:focus {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
 }
 
+.formation-select {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.3s;
+    min-width: 200px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+}
+
+body.dark-mode .formation-select {
+    background: #2a2a2a;
+    border-color: #555;
+    color: #fff;
+}
+
+.formation-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+body.dark-mode .formation-select:focus {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
 .header-right {
     display: flex;
     gap: 15px;
@@ -202,6 +230,8 @@ body.dark-mode .field-card {
     gap: 4px;
     min-width: 180px;
     transition: all 0.3s ease;
+    z-index: 10;
+    position: relative;
 }
 
 body.dark-mode .position-box {
@@ -255,12 +285,9 @@ body.dark-mode .player-input::placeholder {
     color: #888;
 }
 
-/* GB - Gardien Fixe - Colonne 1, Row 4 (milieu vertical) */
-.position-gb {
-    position: absolute;
-    top: 50%;
-    left: 5%;
-    transform: translateY(-50%);
+/* Toutes les positions sont créées dynamiquement par JavaScript */
+[class^="position-"] {
+    z-index: 10;
 }
 
 /* DG - Défenseur gauche - Colonne 2, Row 1 */
