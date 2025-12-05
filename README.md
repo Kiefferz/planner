@@ -103,14 +103,6 @@ Le projet est hébergé gratuitement sur GitHub Pages :
 
 **Site en ligne** : [https://kiefferz.github.io/planner/](https://kiefferz.github.io/planner/)
 
-### Pour héberger votre propre version
-
-1. Créez un dépôt GitHub (public)
-2. Uploadez tous les fichiers
-3. Allez dans Settings → Pages
-4. Sélectionnez la branche `main` et le dossier `/ (root)`
-5. Votre site sera accessible à : `https://votre-username.github.io/nom-du-repo/`
-
 ## 📝 Format des données
 
 Le fichier JSON exporté contient :
@@ -140,7 +132,7 @@ Le fichier JSON exporté contient :
 
 ## 📄 Licence
 
-Libre d'utilisation pour usage personnel et professionnel.
+Libre d'utilisation.
 
 ---
 
