@@ -19,12 +19,23 @@
             </div>
         </div>
         <div class="header-right controls">
-            <button class="btn btn-export" onclick="exportData()">📥 Exporter</button>
-            <div class="file-input-wrapper">
-                <button class="btn btn-import" onclick="document.getElementById('fileInput').click()">📤 Importer</button>
-                <input type="file" id="fileInput" accept=".json" onchange="importData(event)" style="display: none;">
+            <div class="theme-switch-container">
+                <label class="theme-switch">
+                    <input type="checkbox" id="themeToggle" onchange="toggleDarkMode()">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <button class="btn btn-clear" onclick="clearAllData()">🗑️ Vider</button>
+            <div class="settings-dropdown">
+                <button class="btn btn-settings" onclick="toggleSettingsDropdown()">⚙️ Paramètres</button>
+                <div class="dropdown-menu" id="settingsMenu">
+                    <button class="dropdown-item" onclick="exportData()">📥 Exporter</button>
+                    <div class="file-input-wrapper">
+                        <button class="dropdown-item" onclick="document.getElementById('fileInput').click()">📤 Importer</button>
+                        <input type="file" id="fileInput" accept=".json" onchange="importData(event)" style="display: none;">
+                    </div>
+                    <button class="dropdown-item dropdown-item-danger" onclick="clearAllData()">🗑️ Vider</button>
+                </div>
+            </div>
         </div>
     </div>
 

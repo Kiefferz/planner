@@ -301,6 +301,69 @@ function clearAllData() {
 }
 
 // ============================================
+// DARK MODE
+// ============================================
+
+/**
+ * Bascule entre le mode clair et sombre
+ */
+function toggleDarkMode() {
+    const body = document.body;
+    const themeToggle = document.getElementById('themeToggle');
+    const isDarkMode = themeToggle.checked;
+    
+    if (isDarkMode) {
+        body.classList.add('dark-mode');
+    } else {
+        body.classList.remove('dark-mode');
+    }
+    
+    // Sauvegarder la préférence
+    localStorage.setItem('darkMode', isDarkMode);
+}
+
+/**
+ * Charge le thème depuis le localStorage
+ */
+function loadTheme() {
+    const savedTheme = localStorage.getItem('darkMode');
+    const body = document.body;
+    const themeToggle = document.getElementById('themeToggle');
+    
+    if (savedTheme === 'true') {
+        body.classList.add('dark-mode');
+        themeToggle.checked = true;
+    } else {
+        body.classList.remove('dark-mode');
+        themeToggle.checked = false;
+    }
+}
+
+// ============================================
+// DROPDOWN SETTINGS
+// ============================================
+
+/**
+ * Bascule l'affichage du menu déroulant des paramètres
+ */
+function toggleSettingsDropdown() {
+    const menu = document.getElementById('settingsMenu');
+    menu.classList.toggle('show');
+}
+
+/**
+ * Ferme le menu déroulant si on clique en dehors
+ */
+document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.settings-dropdown');
+    const menu = document.getElementById('settingsMenu');
+    
+    if (dropdown && !dropdown.contains(event.target) && menu.classList.contains('show')) {
+        menu.classList.remove('show');
+    }
+});
+
+// ============================================
 // INITIALISATION
 // ============================================
 
@@ -346,6 +409,9 @@ function init() {
 
     // Charger depuis le localStorage
     loadFromLocalStorage();
+    
+    // Charger le thème
+    loadTheme();
 }
 
 // Initialiser l'application quand le DOM est prêt
