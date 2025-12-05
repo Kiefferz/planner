@@ -10,12 +10,21 @@
     <div class="header">
         <div class="header-left">
             <div class="logo-container">
-                <input type="text" id="logoUrlInput" class="logo-url-input" placeholder="URL du logo" />
-                <img id="teamLogo" class="team-logo hidden" src="" alt="Logo équipe" onclick="editLogo()" />
+                <img id="teamLogo" class="team-logo" src="https://github.com/Kiefferz/planner/blob/main/assets/fm_planner.png?raw=true" alt="Logo équipe" onclick="editLogo()" />
             </div>
-            <div class="team-info">
-                <input type="text" id="teamName" placeholder="Nom équipe" />
-                <input type="text" id="season" placeholder="Saison 20xx/20xx" />
+            <div class="team-info" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; align-items:center;">
+                <input type="text" id="teamName" placeholder="Nom équipe" style="grid-column:1/7;" />
+                <input type="text" id="season" placeholder="Saison 20xx/20xx" style="grid-column:1/4;" />
+                <input type="text" id="logoUrlInput" class="logo-url-input" placeholder="URL du logo" style="grid-column:1/4;" />
+                <select id="formationSelect" class="formation-select" onchange="changeFormation(this.value)" style="grid-column:4/7;">
+                    <option value="4-2-3-1">4-2-3-1</option>
+                    <option value="3-4-3">3-4-3</option>
+                    <option value="3-5-2">3-5-2</option>
+                    <option value="4-3-3">4-3-3</option>
+                    <option value="4-1-3-2">4-1-3-2</option>
+                    <option value="4-4-2">4-4-2</option>
+                    <option value="4-1-4-1">4-1-4-1</option>
+                </select>
             </div>
         </div>
         <div class="header-right controls">
@@ -41,119 +50,14 @@
 
     <div class="field-wrapper">
         <div class="field-card">
-            <div class="field-container">
-        <!-- GB - Gardien Fixe -->
-        <div class="position-gb">
-            <div class="position-box">
-                <div class="position-label">GB</div>
-                <input type="text" class="player-input" data-position="gb" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="gb" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="gb" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- DG - Défenseur gauche -->
-        <div class="position-dg">
-            <div class="position-box">
-                <div class="position-label">DG</div>
-                <input type="text" class="player-input" data-position="dg" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="dg" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="dg" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- DC - Défenseur central gauche -->
-        <div class="position-dc-left">
-            <div class="position-box">
-                <div class="position-label">DC</div>
-                <input type="text" class="player-input" data-position="dc-left" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="dc-left" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="dc-left" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- DC - Défenseur central droit -->
-        <div class="position-dc-right">
-            <div class="position-box">
-                <div class="position-label">DC</div>
-                <input type="text" class="player-input" data-position="dc-right" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="dc-right" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="dc-right" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- DD - Défenseur droit -->
-        <div class="position-dd">
-            <div class="position-box">
-                <div class="position-label">DD</div>
-                <input type="text" class="player-input" data-position="dd" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="dd" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="dd" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- MDC - Meneur de jeu Box to Box -->
-        <div class="position-mdc-left">
-            <div class="position-box">
-                <div class="position-label">MDC</div>
-                <input type="text" class="player-input" data-position="mdc-left" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="mdc-left" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="mdc-left" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- MDC - Milieu défensif -->
-        <div class="position-mdc-right">
-            <div class="position-box">
-                <div class="position-label">MDC</div>
-                <input type="text" class="player-input" data-position="mdc-right" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="mdc-right" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="mdc-right" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- AIG - Attaquant Interieur -->
-        <div class="position-aig">
-            <div class="position-box">
-                <div class="position-label">AIG</div>
-                <input type="text" class="player-input" data-position="aig" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="aig" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="aig" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- MOC - Meneur de jeu avancé -->
-        <div class="position-moc">
-            <div class="position-box">
-                <div class="position-label">MOC</div>
-                <input type="text" class="player-input" data-position="moc" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="moc" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="moc" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- AID - Ailier -->
-        <div class="position-aid">
-            <div class="position-box">
-                <div class="position-label">AID</div>
-                <input type="text" class="player-input" data-position="aid" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="aid" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="aid" data-index="2" placeholder="3">
-            </div>
-        </div>
-
-        <!-- BU - Attaquant de couloir -->
-        <div class="position-bu">
-            <div class="position-box">
-                <div class="position-label">BU</div>
-                <input type="text" class="player-input" data-position="bu" data-index="0" placeholder="1">
-                <input type="text" class="player-input" data-position="bu" data-index="1" placeholder="2">
-                <input type="text" class="player-input" data-position="bu" data-index="2" placeholder="3">
-            </div>
+            <div class="field-container" id="fieldContainer">
+                <!-- Les positions seront créées dynamiquement par JavaScript -->
             </div>
         </div>
     </div>
+    </div>
 
+    <script src="js/formations.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

@@ -145,6 +145,34 @@ body.dark-mode .team-info input:focus {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
 }
 
+.formation-select {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.3s;
+    min-width: 200px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+}
+
+body.dark-mode .formation-select {
+    background: #2a2a2a;
+    border-color: #555;
+    color: #fff;
+}
+
+.formation-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+body.dark-mode .formation-select:focus {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
 .header-right {
     display: flex;
     gap: 15px;
@@ -202,11 +230,39 @@ body.dark-mode .field-card {
     gap: 4px;
     min-width: 180px;
     transition: all 0.3s ease;
+    z-index: 10;
+    position: relative;
 }
 
 body.dark-mode .position-box {
     background: rgba(50, 50, 50, 0.95);
     border: 1px solid #888;
+}
+
+/* Alerte danger : moins de 2 joueurs */
+.position-box.alert-danger {
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+body.dark-mode .position-box.alert-danger {
+    background: rgba(180, 30, 45, 0.95);
+    border-color: #dc3545;
+    box-shadow: 0 0 15px rgba(220, 53, 69, 0.7);
+}
+
+/* Alerte warning : moins de 3 joueurs (donc 2) */
+.position-box.alert-warning {
+    background: rgba(255, 193, 7, 0.9);
+    border: 2px solid #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+body.dark-mode .position-box.alert-warning {
+    background: rgba(200, 150, 0, 0.95);
+    border-color: #ffc107;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.7);
 }
 
 .position-label {
@@ -216,10 +272,46 @@ body.dark-mode .position-box {
     margin-bottom: 4px;
     text-align: center;
     transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 body.dark-mode .position-label {
     color: #e0e0e0;
+}
+
+.alert-icon {
+    font-size: 14px;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+.alert-icon-danger {
+    color: #fff;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.alert-icon-warning {
+    color: #856404;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+body.dark-mode .alert-icon-warning {
+    color: #ffc107;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
 
 .player-input {
@@ -255,12 +347,9 @@ body.dark-mode .player-input::placeholder {
     color: #888;
 }
 
-/* GB - Gardien Fixe - Colonne 1, Row 4 (milieu vertical) */
-.position-gb {
-    position: absolute;
-    top: 50%;
-    left: 5%;
-    transform: translateY(-50%);
+/* Toutes les positions sont créées dynamiquement par JavaScript */
+[class^="position-"] {
+    z-index: 10;
 }
 
 /* DG - Défenseur gauche - Colonne 2, Row 1 */
