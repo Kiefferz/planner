@@ -24,78 +24,83 @@ Tout cela sans quitter votre partie FM ni perdre de temps dans les menus du jeu.
 
 ## 📋 Fonctionnalités
 
-- **Formation tactique 4-2-3-1** : Visualisation claire des positions sur le terrain
-- **Gestion de la profondeur** : 3 joueurs par poste (titulaire + 2 remplaçants) pour identifier rapidement les besoins
-- **Logo d'équipe** : Personnalisation avec logo via URL
-- **Informations équipe** : Nom de l'équipe et saison
-- **Export/Import JSON** : Sauvegardez vos formations et partagez-les
-- **Sauvegarde automatique** : Données sauvegardées automatiquement dans le navigateur
+### Formations tactiques
+- **7 formations disponibles** : 4-2-3-1, 3-4-3, 3-5-2, 4-3-3, 4-1-3-2, 4-4-2, 4-1-4-1
+- **Sélection dynamique** : Changez de formation à tout moment sans perdre vos données
 
-## 🏗️ Structure du projet
+### Système d'alerte visuelle
+- 🔴 **Rouge** : Moins de 2 joueurs (manque critique de profondeur) - Icône ⚠️
+- 🟠 **Orange** : 2 joueurs (profondeur limitée, risque en cas de blessure) - Icône ⚡
+- ⚪ **Normal** : 3 joueurs remplis (profondeur suffisante)
 
-```
-planner/
-├── index.html          # Page principale
-├── css/
-│   └── style.css       # Styles CSS
-├── js/
-│   └── app.js          # Logique JavaScript
-├── assets/
-│   └── pitch.png       # Image du terrain
-├── README.md           # Documentation
-├── .nojekyll           # Configuration GitHub Pages
-└── .gitignore          # Fichiers ignorés par Git
-```
+Les alertes se mettent à jour en temps réel lors de la saisie, vous permettant d'identifier instantanément les postes nécessitant du renfort.
+
+### Gestion de la profondeur
+- **3 joueurs par poste** : Visualisez la profondeur de banc pour chaque position (titulaire + 2 remplaçants)
+- **Identification rapide** : Les alertes visuelles vous indiquent immédiatement les postes à renforcer
+
+### Informations de l'équipe
+- **Logo personnalisé** : Chargez un logo depuis une URL (logo par défaut FM Planner inclus)
+- **Nom de l'équipe** : Enregistrez le nom de votre équipe
+- **Saison** : Indiquez la saison en cours (ex: 2024/2025)
+
+### Export/Import
+- **Exporter votre équipe** : Exporter votre équipe pour la charger plus tard (utile si plusieurs save)
+- **Import rapide** : Chargez vos formations précédentes en un clic
+- **Sauvegarde automatique** : Toutes les modifications sont sauvegardées automatiquement dans le navigateur
+- **Persistance** : Vos données sont conservées même après un rafraîchissement de page (F5)
+
+### Interface
+- **Design moderne** : Interface épurée avec effets glassmorphism et animations
+- **Dark mode** : Basculez entre mode clair et sombre avec un switch
+- **Menu paramètres** : Accès rapide à l'export, l'import et la fonction de vidage
+
 
 ## 🚀 Installation
 
-1. Clonez le dépôt ou téléchargez les fichiers
-2. Assurez-vous que `pitch.png` est dans le dossier `assets/`
-3. Ouvrez `index.html` dans un navigateur
-
-**Ou utilisez directement la version en ligne** : [https://kiefferz.github.io/planner/](https://kiefferz.github.io/planner/)
+**Utilisez directement la version en ligne** : [https://kiefferz.github.io/planner/](https://kiefferz.github.io/planner/)
 
 ## 📖 Utilisation
 
 ### Configuration de l'équipe
 
-- **Logo** : Saisissez l'URL de l'image du logo. L'image se charge automatiquement. Cliquez sur l'image pour modifier l'URL.
+- **Logo** : Saisissez l'URL de l'image du logo dans le champ prévu. L'image se charge automatiquement. Cliquez sur l'image pour modifier l'URL. Le logo par défaut FM Planner s'affiche si aucun logo n'est chargé.
 - **Nom équipe** : Saisissez le nom de votre équipe
-- **Saison** : Indiquez la saison (ex: 2024/2025)
+- **Saison** : Indiquez la saison (ex: 2024/2025 ou Saison 2024/2025)
+- **Formation** : Sélectionnez la formation tactique souhaitée dans le menu déroulant
 
 ### Gestion des joueurs
 
-- Remplissez les champs pour chaque position (titulaire + 2 remplaçants)
-- **3 joueurs par poste** : Permet d'identifier rapidement la profondeur de votre effectif
-- Les données sont sauvegardées automatiquement dans le navigateur
+- Remplissez les champs pour chaque position (3 joueurs par poste)
+- **Système d'alerte** : Surveillez les couleurs des cadres pour identifier rapidement les postes à renforcer
+  - Cadre rouge = moins de 2 joueurs (critique)
+  - Cadre orange = 2 joueurs (attention)
+  - Cadre normal = 3 joueurs (OK)
+- Les données sont sauvegardées automatiquement dans le navigateur à chaque modification
 
 ### Export/Import
 
-- **Exporter** : Télécharge un fichier JSON avec toutes les données (joueurs, logo, nom équipe, saison)
+- **Exporter** : Télécharge un fichier JSON avec toutes les données (joueurs, logo, nom équipe, saison, formation)
+  - Le nom du fichier est généré automatiquement : `nom_equipe_saison2024_2025.json`
 - **Importer** : Charge un fichier JSON précédemment exporté
-- **Vider** : Réinitialise tous les champs
+  - Les données sont restaurées automatiquement (formation, joueurs, infos équipe)
+- **Vider** : Réinitialise tous les champs (avec confirmation)
 
-## 🎯 Positions disponibles (Formation 4-2-3-1)
+### Astuces
 
-- **GB** : Gardien de but
-- **DG** : Défenseur gauche
-- **DC** : Défenseur central (2 positions)
-- **DD** : Défenseur droit
-- **MDC** : Milieu défensif (2 positions)
-- **AIG** : Ailier gauche / Attaquant intérieur gauche
-- **MOC** : Milieu offensif central
-- **AID** : Ailier droit
-- **BU** : Buteur / Attaquant de pointe
+- Les données sont sauvegardées automatiquement à chaque modification
+- Utilisez le bouton "Vider" dans le menu Paramètres pour réinitialiser tous les champs
+- Cliquez sur le logo pour le modifier
+- Les alertes se mettent à jour en temps réel lors de la saisie
+- Vos données sont conservées même après un rafraîchissement de page (F5)
+
 
 ## 🔮 Axes d'amélioration
 
-### Formation actuelle
-- ✅ **4-2-3-1** : Formation disponible et fonctionnelle
-
 ### À venir
-- 🔄 **Autres formations** : D'autres formations tactiques seront ajoutées progressivement
-- 🔄 **Personnalisation** : Possibilité de créer ses propres formations
-- 🔄 **Statistiques** : Analyse de la profondeur par poste
+- 🔄 **Formations personnalisées** : Possibilité de créer ses propres formations
+- 🔄 **Statistiques** : Analyse de la profondeur par poste et recommandations
+- 🔄 **Personnalisation de la profondeur de banc** : Possibilité de personnalisé sa profondeur de banc (actuellement a 3) + personnalisation des seuils d'alerte de profondeur
 
 ## 🌐 Hébergement GitHub Pages
 
@@ -103,32 +108,16 @@ Le projet est hébergé gratuitement sur GitHub Pages :
 
 **Site en ligne** : [https://kiefferz.github.io/planner/](https://kiefferz.github.io/planner/)
 
-## 📝 Format des données
 
-Le fichier JSON exporté contient :
-
-```json
-{
-  "formation": "4-2-3-1",
-  "logoUrl": "https://...",
-  "teamName": "Nom équipe",
-  "season": "2024/2025",
-  "players": {
-    "gb": { "0": "Joueur1", "1": "Joueur2", "2": "Joueur3" },
-    "dg": { "0": "Joueur1", "1": "Joueur2", "2": "Joueur3" },
-    ...
-  },
-  "exportDate": "2024-12-05T..."
-}
-```
 
 ## 🛠️ Technologies
 
 - **HTML5** : Structure de la page
-- **CSS3** : Styles et mise en page
-- **JavaScript (Vanilla)** : Logique de l'application
-- **LocalStorage API** : Sauvegarde automatique
+- **CSS3** : Styles, animations, transitions, glassmorphism, dark mode
+- **JavaScript (Vanilla ES6+)** : Logique de l'application
+- **LocalStorage API** : Sauvegarde automatique et persistance
 - **File API** : Export/Import de fichiers JSON
+- **FileReader API** : Lecture des fichiers importés
 
 ## 📄 Licence
 
