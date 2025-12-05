@@ -216,7 +216,7 @@ body.dark-mode .field-card {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 8px;
 }
 

@@ -689,9 +689,23 @@ function init() {
     console.log('Initialisation de l\'application...');
     console.log('Formations disponibles:', typeof formations !== 'undefined' ? Object.keys(formations) : 'NON CHARGÉES');
     
+    // Vérifier que formations.js est chargé
+    if (typeof formations === 'undefined') {
+        console.error('Le fichier formations.js n\'est pas chargé, réessai dans 100ms...');
+        setTimeout(init, 100);
+        return;
+    }
+    
     // Vérifier que le DOM est prêt
     if (!document.getElementById('formationSelect')) {
         console.error('Le DOM n\'est pas prêt, réessai dans 100ms...');
+        setTimeout(init, 100);
+        return;
+    }
+    
+    // Vérifier que le conteneur existe
+    if (!document.getElementById('fieldContainer')) {
+        console.error('Le conteneur fieldContainer n\'existe pas, réessai dans 100ms...');
         setTimeout(init, 100);
         return;
     }
