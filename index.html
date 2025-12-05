@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner Football</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .logo-url-input {
+            width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .logo-url-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .team-logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-url-input.hidden {
+            display: none;
+        }
+
+        .team-logo.hidden {
+            display: none;
+        }
+
+        .team-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .team-info input {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            min-width: 200px;
+        }
+
+        .team-info input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+        }
+
+        .field-container {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            background-image: url('pitch.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        .position-box {
+            background: rgba(200, 200, 200, 0.9);
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+        }
+
+        .position-label {
+            font-weight: bold;
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .player-input {
+            background: white;
+            border: 1px solid #999;
+            border-radius: 3px;
+            padding: 6px 8px;
+            font-size: 13px;
+            width: 100%;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .player-input:focus {
+            outline: none;
+            border-color: #4a7c2a;
+            box-shadow: 0 0 5px rgba(74, 124, 42, 0.3);
+        }
+
+        /* GB - Gardien Fixe - Colonne 1, Row 4 (milieu vertical) */
+        .position-gb {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+        }
+
+        /* DG - Défenseur gauche - Colonne 2, Row 1 */
+        .position-dg {
+            position: absolute;
+            top: 8%;
+            left: 18%;
+        }
+
+        /* DC - Défenseur central gauche - Colonne 2, Row 3 */
+        .position-dc-left {
+            position: absolute;
+            top: 32%;
+            left: 18%;
+        }
+
+        /* DC - Défenseur central droit - Colonne 2, Row 5 */
+        .position-dc-right {
+            position: absolute;
+            top: 56%;
+            left: 18%;
+        }
+
+        /* DD - Défenseur droit - Colonne 2, Row 7 */
+        .position-dd {
+            position: absolute;
+            top: 80%;
+            left: 18%;
+        }
+
+        /* MDC - Meneur de jeu Box to Box - Colonne 4, Row 3 */
+        .position-mdc-left {
+            position: absolute;
+            top: 32%;
+            left: 44%;
+        }
+
+        /* MDC - Milieu défensif - Colonne 4, Row 5 */
+        .position-mdc-right {
+            position: absolute;
+            top: 56%;
+            left: 44%;
+        }
+
+        /* AIG - Attaquant Interieur - Colonne 5, Row 1 */
+        .position-aig {
+            position: absolute;
+            top: 8%;
+            left: 70%;
+        }
+
+        /* MOC - Meneur de jeu avancé - Colonne 5, Row 4 (même ligne que GB et BU) */
+        .position-moc {
+            position: absolute;
+            top: 50%;
+            left: 70%;
+            transform: translateY(-50%);
+        }
+
+        /* AID - Ailier - Colonne 5, Row 7 */
+        .position-aid {
+            position: absolute;
+            top: 80%;
+            left: 70%;
+        }
+
+        /* BU - Attaquant de couloir - Colonne 7, Row 4 (même ligne que GB et MOC) */
+        .position-bu {
+            position: absolute;
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-import {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-import:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        @media (max-width: 768px) {
+            .position-box {
+                min-width: 140px;
+                padding: 6px;
+            }
+
+            .player-input {
+                font-size: 11px;
+                padding: 4px 6px;
+            }
+
+            .position-label {
+                font-size: 10px;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <input type="text" id="logoUrlInput" class="logo-url-input" placeholder="URL du logo" />
+                <img id="teamLogo" class="team-logo hidden" src="" alt="Logo équipe" onclick="editLogo()" />
+            </div>
+            <div class="team-info">
+                <input type="text" id="teamName" placeholder="Nom équipe" />
+                <input type="text" id="season" placeholder="Saison 20xx/20xx" />
+            </div>
+        </div>
+        <div class="header-right controls">
+            <button class="btn btn-export" onclick="exportData()">📥 Exporter</button>
+            <div class="file-input-wrapper">
+                <button class="btn btn-import" onclick="document.getElementById('fileInput').click()">📤 Importer</button>
+                <input type="file" id="fileInput" accept=".json" onchange="importData(event)" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <div class="field-container">
+        <!-- GB - Gardien Fixe -->
+        <div class="position-gb">
+            <div class="position-box">
+                <div class="position-label">GB</div>
+                <input type="text" class="player-input" data-position="gb" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="gb" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="gb" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- DG - Défenseur gauche -->
+        <div class="position-dg">
+            <div class="position-box">
+                <div class="position-label">DG</div>
+                <input type="text" class="player-input" data-position="dg" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="dg" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="dg" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- DC - Défenseur central gauche -->
+        <div class="position-dc-left">
+            <div class="position-box">
+                <div class="position-label">DC</div>
+                <input type="text" class="player-input" data-position="dc-left" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="dc-left" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="dc-left" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- DC - Défenseur central droit -->
+        <div class="position-dc-right">
+            <div class="position-box">
+                <div class="position-label">DC</div>
+                <input type="text" class="player-input" data-position="dc-right" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="dc-right" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="dc-right" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- DD - Défenseur droit -->
+        <div class="position-dd">
+            <div class="position-box">
+                <div class="position-label">DD</div>
+                <input type="text" class="player-input" data-position="dd" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="dd" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="dd" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- MDC - Meneur de jeu Box to Box -->
+        <div class="position-mdc-left">
+            <div class="position-box">
+                <div class="position-label">MDC</div>
+                <input type="text" class="player-input" data-position="mdc-left" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="mdc-left" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="mdc-left" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- MDC - Milieu défensif -->
+        <div class="position-mdc-right">
+            <div class="position-box">
+                <div class="position-label">MDC</div>
+                <input type="text" class="player-input" data-position="mdc-right" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="mdc-right" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="mdc-right" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- AIG - Attaquant Interieur -->
+        <div class="position-aig">
+            <div class="position-box">
+                <div class="position-label">AIG</div>
+                <input type="text" class="player-input" data-position="aig" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="aig" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="aig" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- MOC - Meneur de jeu avancé -->
+        <div class="position-moc">
+            <div class="position-box">
+                <div class="position-label">MOC</div>
+                <input type="text" class="player-input" data-position="moc" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="moc" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="moc" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- AID - Ailier -->
+        <div class="position-aid">
+            <div class="position-box">
+                <div class="position-label">AID</div>
+                <input type="text" class="player-input" data-position="aid" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="aid" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="aid" data-index="2" placeholder="3">
+            </div>
+        </div>
+
+        <!-- BU - Attaquant de couloir -->
+        <div class="position-bu">
+            <div class="position-box">
+                <div class="position-label">BU</div>
+                <input type="text" class="player-input" data-position="bu" data-index="0" placeholder="1">
+                <input type="text" class="player-input" data-position="bu" data-index="1" placeholder="2">
+                <input type="text" class="player-input" data-position="bu" data-index="2" placeholder="3">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour charger le logo depuis l'URL
+        function loadLogo(url) {
+            if (!url || url.trim() === '') return;
+            
+            const logoImg = document.getElementById('teamLogo');
+            const logoInput = document.getElementById('logoUrlInput');
+            
+            logoImg.onload = function() {
+                // Image chargée avec succès
+                logoImg.classList.remove('hidden');
+                logoInput.classList.add('hidden');
+                saveToLocalStorage();
+            };
+            
+            logoImg.onerror = function() {
+                // Erreur de chargement
+                alert('❌ Impossible de charger l\'image. Vérifiez l\'URL.');
+                logoInput.value = url; // Garder l'URL dans l'input
+            };
+            
+            logoImg.src = url.trim();
+        }
+
+        // Fonction pour éditer le logo (clic sur l'image)
+        function editLogo() {
+            const logoImg = document.getElementById('teamLogo');
+            const logoInput = document.getElementById('logoUrlInput');
+            
+            logoInput.value = logoImg.src || '';
+            logoInput.classList.remove('hidden');
+            logoImg.classList.add('hidden');
+            logoInput.focus();
+        }
+
+        // Écouter la saisie dans l'input logo
+        document.getElementById('logoUrlInput').addEventListener('blur', function() {
+            const url = this.value.trim();
+            if (url) {
+                loadLogo(url);
+            }
+        });
+
+        // Charger le logo avec Enter
+        document.getElementById('logoUrlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const url = this.value.trim();
+                if (url) {
+                    loadLogo(url);
+                }
+            }
+        });
+
+        // Récupérer les paramètres URL
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Charger le logo depuis l'URL si présent
+        window.addEventListener('load', function() {
+            const logoUrl = getUrlParameter('logo');
+            if (logoUrl) {
+                document.getElementById('logoUrlInput').value = decodeURIComponent(logoUrl);
+                loadLogo(decodeURIComponent(logoUrl));
+            }
+            loadFromLocalStorage();
+        });
+
+        // Fonction pour exporter les données
+        function exportData() {
+            const players = {};
+            const inputs = document.querySelectorAll('.player-input');
+            
+            inputs.forEach(input => {
+                const position = input.getAttribute('data-position');
+                const index = input.getAttribute('data-index');
+                const name = input.value.trim();
+                if (name) {
+                    if (!players[position]) {
+                        players[position] = {};
+                    }
+                    players[position][index] = name;
+                }
+            });
+
+            const logoUrl = document.getElementById('teamLogo').src || '';
+            const teamName = document.getElementById('teamName').value.trim() || '';
+            const season = document.getElementById('season').value.trim() || '';
+
+            const data = {
+                formation: '4-2-3-1',
+                logoUrl: logoUrl,
+                teamName: teamName,
+                season: season,
+                players: players,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `formation-football-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert('✅ Données exportées avec succès !');
+        }
+
+        // Fonction pour importer les données
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.players) {
+                        // Charger les informations de l'équipe
+                        if (data.logoUrl) {
+                            document.getElementById('logoUrlInput').value = data.logoUrl;
+                            loadLogo(data.logoUrl);
+                        }
+                        if (data.teamName) {
+                            document.getElementById('teamName').value = data.teamName;
+                        }
+                        if (data.season) {
+                            document.getElementById('season').value = data.season;
+                        }
+
+                        // Réinitialiser tous les champs
+                        const inputs = document.querySelectorAll('.player-input');
+                        inputs.forEach(input => input.value = '');
+
+                        // Remplir les champs avec les données importées
+                        Object.keys(data.players).forEach(position => {
+                            const positionData = data.players[position];
+                            // Support ancien format (array) et nouveau format (object)
+                            if (Array.isArray(positionData)) {
+                                positionData.forEach((name, index) => {
+                                    const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
+                                    if (input) {
+                                        input.value = name;
+                                    }
+                                });
+                            } else {
+                                Object.keys(positionData).forEach(index => {
+                                    const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
+                                    if (input) {
+                                        input.value = positionData[index];
+                                    }
+                                });
+                            }
+                        });
+
+                        // Sauvegarder dans localStorage
+                        saveToLocalStorage();
+
+                        alert('✅ Données importées avec succès !');
+                    } else {
+                        alert('❌ Format de fichier invalide.');
+                    }
+                } catch (error) {
+                    alert('❌ Erreur lors de l\'importation : ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Réinitialiser l'input file pour permettre de réimporter le même fichier
+            event.target.value = '';
+        }
+
+        // Sauvegarder automatiquement dans le localStorage
+        document.querySelectorAll('.player-input').forEach(input => {
+            input.addEventListener('input', function() {
+                saveToLocalStorage();
+            });
+        });
+
+        // Sauvegarder les infos équipe
+        document.getElementById('teamName').addEventListener('input', saveToLocalStorage);
+        document.getElementById('season').addEventListener('input', saveToLocalStorage);
+
+        function saveToLocalStorage() {
+            const players = {};
+            document.querySelectorAll('.player-input').forEach(input => {
+                const position = input.getAttribute('data-position');
+                const index = input.getAttribute('data-index');
+                const name = input.value.trim();
+                if (name) {
+                    if (!players[position]) {
+                        players[position] = {};
+                    }
+                    players[position][index] = name;
+                }
+            });
+
+            const logoUrl = document.getElementById('teamLogo').src || '';
+            const teamName = document.getElementById('teamName').value.trim() || '';
+            const season = document.getElementById('season').value.trim() || '';
+
+            const data = {
+                logoUrl: logoUrl,
+                teamName: teamName,
+                season: season,
+                players: players
+            };
+
+            localStorage.setItem('footballFormation', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('footballFormation');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    
+                    // Charger les infos équipe
+                    if (data.logoUrl) {
+                        document.getElementById('logoUrlInput').value = data.logoUrl;
+                        loadLogo(data.logoUrl);
+                    }
+                    if (data.teamName) {
+                        document.getElementById('teamName').value = data.teamName;
+                    }
+                    if (data.season) {
+                        document.getElementById('season').value = data.season;
+                    }
+
+                    // Charger les joueurs
+                    const players = data.players || data; // Support ancien format
+                    if (players && typeof players === 'object') {
+                        Object.keys(players).forEach(position => {
+                            const positionData = players[position];
+                            // Support ancien format (array) et nouveau format (object)
+                            if (Array.isArray(positionData)) {
+                                positionData.forEach((name, index) => {
+                                    const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
+                                    if (input) {
+                                        input.value = name;
+                                    }
+                                });
+                            } else if (typeof positionData === 'object') {
+                                Object.keys(positionData).forEach(index => {
+                                    const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
+                                    if (input) {
+                                        input.value = positionData[index];
+                                    }
+                                });
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du chargement:', error);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
