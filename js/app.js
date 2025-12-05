@@ -178,7 +178,7 @@ function createPositionElement(positionKey, layout) {
  * Change la formation tactique
  * @param {string} formation - Nom de la formation (ex: '4-2-3-1')
  */
-function changeFormation(formation) {
+function changeFormation(formation, skipSaveCurrent = false) {
     if (typeof formations === 'undefined') {
         console.error('Le fichier formations.js n\'est pas chargé');
         return;
@@ -189,8 +189,10 @@ function changeFormation(formation) {
         return;
     }
 
-    // Sauvegarder les valeurs actuelles avant de changer
-    saveCurrentPlayerValues();
+    // Sauvegarder les valeurs actuelles avant de changer (sauf si on charge depuis localStorage/import)
+    if (!skipSaveCurrent) {
+        saveCurrentPlayerValues();
+    }
 
     currentFormation = formation;
     const config = formations[formation];
@@ -213,23 +215,26 @@ function changeFormation(formation) {
     });
 
     // Restaurer les valeurs sauvegardées après création
-    Object.keys(savedPlayerValues).forEach(position => {
-        Object.keys(savedPlayerValues[position]).forEach(index => {
-            const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
-            if (input) {
-                input.value = savedPlayerValues[position][index];
-            }
+    // Utiliser setTimeout pour s'assurer que le DOM est complètement rendu
+    setTimeout(() => {
+        Object.keys(savedPlayerValues).forEach(position => {
+            Object.keys(savedPlayerValues[position]).forEach(index => {
+                const input = document.querySelector(`[data-position="${position}"][data-index="${index}"]`);
+                if (input) {
+                    input.value = savedPlayerValues[position][index];
+                }
+            });
         });
-    });
 
-    // Mettre à jour les alertes pour toutes les positions
-    config.positions.forEach(positionKey => {
-        updatePositionAlert(positionKey);
-    });
+        // Mettre à jour les alertes pour toutes les positions après restauration
+        config.positions.forEach(positionKey => {
+            updatePositionAlert(positionKey);
+        });
 
-    // Sauvegarder la formation
-    saveToLocalStorage();
-    
+        // Sauvegarder dans localStorage APRÈS avoir restauré les valeurs
+        saveToLocalStorage();
+    }, 50);
+
     // Mettre à jour le select
     const select = document.getElementById('formationSelect');
     if (select) {
@@ -333,9 +338,46 @@ function exportData() {
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     
+    // Générer le nom du fichier : nom_equipe_saisonxxxx_xxxx.json
+    // Fonction pour nettoyer le texte (remplacer espaces et caractères spéciaux par _)
+    function sanitizeFileName(text) {
+        return text
+            .replace(/[^a-zA-Z0-9]/g, '_') // Remplacer tous les caractères non alphanumériques par _
+            .replace(/_+/g, '_') // Remplacer les underscores multiples par un seul
+            .replace(/^_|_$/g, ''); // Supprimer les underscores en début et fin
+    }
+    
+    // Construire le nom du fichier
+    const cleanTeamName = sanitizeFileName(teamName || 'equipe');
+    let cleanSeason = '';
+    
+    if (season) {
+        // Extraire les années de la saison (format: "Saison 2023/2024" ou "2023/2024" ou "2023-2024")
+        const seasonMatch = season.match(/(\d{4})[\/\-](\d{4})/);
+        if (seasonMatch) {
+            cleanSeason = `${seasonMatch[1]}_${seasonMatch[2]}`;
+        } else {
+            // Si le format n'est pas reconnu, nettoyer la saison telle quelle
+            cleanSeason = sanitizeFileName(season);
+        }
+    }
+    
+    // Construire le nom final
+    let fileName = '';
+    if (cleanSeason) {
+        fileName = `${cleanTeamName}_saison${cleanSeason}.json`;
+    } else {
+        fileName = `${cleanTeamName}.json`;
+    }
+    
+    // Si le nom est vide, utiliser un nom par défaut
+    if (!fileName || fileName === '.json') {
+        fileName = `formation-football-${new Date().toISOString().split('T')[0]}.json`;
+    }
+    
     const link = document.createElement('a');
     link.href = url;
-    link.download = `formation-football-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -359,10 +401,23 @@ function importData(event) {
             
             if (data.players) {
                 // Charger les informations de l'équipe
-                if (data.logoUrl) {
-                    document.getElementById('logoUrlInput').value = data.logoUrl;
+                const logoImg = document.getElementById('teamLogo');
+                const logoInput = document.getElementById('logoUrlInput');
+                
+                if (data.logoUrl && data.logoUrl.trim() !== '' && data.logoUrl !== 'assets/fm_planner.png') {
+                    // Charger le logo personnalisé
+                    logoInput.value = data.logoUrl;
                     loadLogo(data.logoUrl);
+                } else {
+                    // Afficher le logo par défaut
+                    if (logoImg && logoInput) {
+                        logoImg.src = 'assets/fm_planner.png';
+                        logoImg.classList.remove('hidden');
+                        logoInput.value = '';
+                        logoInput.classList.add('hidden');
+                    }
                 }
+                
                 if (data.teamName) {
                     document.getElementById('teamName').value = data.teamName;
                 }
@@ -382,7 +437,7 @@ function importData(event) {
                                 savedPlayerValues[position][index.toString()] = name;
                             }
                         });
-                    } else {
+                    } else if (typeof positionData === 'object' && positionData !== null) {
                         Object.keys(positionData).forEach(index => {
                             if (positionData[index]) {
                                 savedPlayerValues[position][index] = positionData[index];
@@ -392,20 +447,18 @@ function importData(event) {
                 });
 
                 // Charger la formation (les valeurs seront restaurées automatiquement)
-                if (data.formation && formations[data.formation]) {
+                // Passer skipSaveCurrent=true pour ne pas écraser savedPlayerValues
+                if (data.formation && typeof formations !== 'undefined' && formations[data.formation]) {
                     document.getElementById('formationSelect').value = data.formation;
-                    changeFormation(data.formation);
+                    changeFormation(data.formation, true);
                 } else {
                     // Si pas de formation, utiliser la formation actuelle
-                    changeFormation(currentFormation);
+                    changeFormation(currentFormation, true);
                 }
-
-                // Sauvegarder dans localStorage
-                saveToLocalStorage();
 
                 alert('✅ Données importées avec succès !');
             } else {
-                alert('❌ Format de fichier invalide.');
+                alert('❌ Format de fichier invalide. Le fichier doit contenir un objet "players".');
             }
         } catch (error) {
             alert('❌ Erreur lors de l\'importation : ' + error.message);
@@ -711,8 +764,9 @@ function init() {
     }
     
     // Initialiser la formation (les valeurs seront restaurées automatiquement)
+    // Passer skipSaveCurrent=true car on charge depuis localStorage
     console.log('Chargement de la formation:', formationToLoad);
-    changeFormation(formationToLoad);
+    changeFormation(formationToLoad, true);
     
     console.log('Initialisation terminée');
 }
